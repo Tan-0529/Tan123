@@ -3,13 +3,18 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:components="clr-namespace:SmartShop.Components"
         Title="SmartShop AI" Height="720" Width="520"
+        Background="{DynamicResource WindowBackground}"
         WindowStartupLocation="CenterScreen">
     <DockPanel>
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="12,8" VerticalAlignment="Center">
-            <TextBlock Text="SmartShop AI 智能导购" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
+            <TextBlock Text="SmartShop AI 智能导购" FontSize="16" FontWeight="Bold"
+                       Foreground="{DynamicResource ForegroundBrush}" VerticalAlignment="Center"/>
+            <Button Content="🌙" Width="32" Height="28" Margin="12,0,0,0" Background="Transparent"
+                    BorderThickness="0" FontSize="14" Cursor="Hand"
+                    Click="ThemeBtn_Click" ToolTip="切换深色/浅色模式"/>
         </StackPanel>
 
-        <Border DockPanel.Dock="Bottom" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="12">
+        <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="12">
             <DockPanel>
                 <Button x:Name="SendBtn" DockPanel.Dock="Right" Content="发送"
                         Width="80" Height="40" Margin="8,0,0,0"
@@ -20,6 +25,9 @@
                 <TextBox x:Name="InputBox" TextWrapping="Wrap" AcceptsReturn="True"
                          VerticalContentAlignment="Center" MinHeight="40" MaxHeight="120"
                          FontSize="14" PreviewKeyDown="InputBox_KeyDown"
+                         Background="{DynamicResource InputBackgroundBrush}"
+                         Foreground="{DynamicResource ForegroundBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
                          PreviewMouseWheel="InputBox_PreviewMouseWheel"/>
             </DockPanel>
         </Border>
@@ -37,7 +45,7 @@
                         <Border Padding="12" Margin="0,6" CornerRadius="10" MaxWidth="400">
                             <Border.Style>
                                 <Style TargetType="Border">
-                                    <Setter Property="Background" Value="#F2F3F5"/>
+                                    <Setter Property="Background" Value="{DynamicResource AssistantBubbleBrush}"/>
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
                                     <Setter Property="RenderTransform">
                                         <Setter.Value>
@@ -46,7 +54,7 @@
                                     </Setter>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Role}" Value="user">
-                                            <Setter Property="Background" Value="#D6EAF8"/>
+                                            <Setter Property="Background" Value="{DynamicResource UserBubbleBrush}"/>
                                             <Setter Property="HorizontalAlignment" Value="Right"/>
                                         </DataTrigger>
                                         <EventTrigger RoutedEvent="Loaded">
@@ -72,7 +80,8 @@
                                        HorizontalAlignment="Left"/>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
-                                               FontSize="14" LineHeight="22" MaxWidth="360"/>
+                                               FontSize="14" LineHeight="22" MaxWidth="360"
+                                               Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBlock Text="▌" FontSize="14" Foreground="#4A90D9"
                                                VerticalAlignment="Bottom" Margin="2,0,0,0">
                                         <TextBlock.Style>

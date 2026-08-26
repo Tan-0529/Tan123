@@ -41,6 +41,11 @@ public partial class MainWindow : Window
         if (_followBottom) MsgScroll.ScrollToEnd();
     }
 
+    private void ThemeBtn_Click(object sender, RoutedEventArgs e)
+    {
+        App.ToggleTheme();
+    }
+
     private async void SendBtn_Click(object sender, RoutedEventArgs e) => await Send();
 
     private void ImageBtn_Click(object sender, RoutedEventArgs e)
