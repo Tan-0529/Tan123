@@ -1,0 +1,12 @@
+fastapi>=0.141
+uvicorn[standard]>=0.52
+pydantic>=2.13
+pydantic-settings>=2.15
+openai>=3.3
+httpx>=0.28
+pymilvus>=3.0
+milvus-lite>=3.2
+beautifulsoup4>=4.12
+python-multipart>=0.0.32
+pytest>=8
+pytest-asyncio>=0.24
