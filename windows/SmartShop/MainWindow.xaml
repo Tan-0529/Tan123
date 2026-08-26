@@ -38,11 +38,30 @@
                                 <Style TargetType="Border">
                                     <Setter Property="Background" Value="#F2F3F5"/>
                                     <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="RenderTransform">
+                                        <Setter.Value>
+                                            <TranslateTransform Y="20"/>
+                                        </Setter.Value>
+                                    </Setter>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Role}" Value="user">
                                             <Setter Property="Background" Value="#D6EAF8"/>
                                             <Setter Property="HorizontalAlignment" Value="Right"/>
                                         </DataTrigger>
+                                        <EventTrigger RoutedEvent="Loaded">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                     From="0" To="1" Duration="0:0:0.25"/>
+                                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                                     From="20" To="0" Duration="0:0:0.3">
+                                                        <DoubleAnimation.EasingFunction>
+                                                            <CubicEase EasingMode="EaseOut"/>
+                                                        </DoubleAnimation.EasingFunction>
+                                                    </DoubleAnimation>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
@@ -50,8 +69,34 @@
                                 <Image Source="{Binding Image}" MaxHeight="200" MaxWidth="340"
                                        Stretch="Uniform" Margin="0,0,0,8"
                                        HorizontalAlignment="Left"/>
-                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
-                                           FontSize="14" LineHeight="22"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
+                                               FontSize="14" LineHeight="22" MaxWidth="360"/>
+                                    <TextBlock Text="▌" FontSize="14" Foreground="#4A90D9"
+                                               VerticalAlignment="Bottom" Margin="2,0,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsStreaming}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                        <TextBlock.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                         From="1" To="0.2" Duration="0:0:0.4"
+                                                                         AutoReverse="True" RepeatBehavior="Forever"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </TextBlock.Triggers>
+                                    </TextBlock>
+                                </StackPanel>
                                 <ItemsControl ItemsSource="{Binding Cards}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>

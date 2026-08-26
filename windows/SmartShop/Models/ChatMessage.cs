@@ -18,6 +18,13 @@ public class ChatMessage : ViewModelBase
 
     public ImageSource? Image { get; set; }
 
+    private bool _isStreaming;
+    public bool IsStreaming
+    {
+        get => _isStreaming;
+        set { _isStreaming = value; OnPropertyChanged(); }
+    }
+
     public ObservableCollection<ProductCardModel> Cards { get; } = new();
 }
 

@@ -31,12 +31,17 @@ public class ChatViewModel : ViewModelBase
         {
             Flush();
             IsSending = false;
+            if (_reply != null) _reply.IsStreaming = false;
             _reply = null;
         };
         _stream.OnError = err =>
         {
             Flush();
-            if (_reply != null) _reply.Text += $"\n[错误] {err}";
+            if (_reply != null)
+            {
+                _reply.Text += $"\n[错误] {err}";
+                _reply.IsStreaming = false;
+            }
             IsSending = false;
         };
     }
@@ -50,7 +55,7 @@ public class ChatViewModel : ViewModelBase
             Text = text,
             Image = imageBase64 is null ? null : DecodeBase64(imageBase64),
         });
-        _reply = new ChatMessage { Role = "assistant" };
+        _reply = new ChatMessage { Role = "assistant", IsStreaming = true };
         Messages.Add(_reply);
         IsSending = true;
         _pending = "";
