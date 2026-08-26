@@ -14,3 +14,8 @@ def test_settings_from_env(monkeypatch):
     settings = Settings(_env_file=None)
     assert settings.embedding_dim == 768
     assert settings.openai_api_key == "sk-test"
+
+
+def test_settings_llm_model_default():
+    settings = Settings(_env_file=None)
+    assert settings.llm_model == "gpt-4o"

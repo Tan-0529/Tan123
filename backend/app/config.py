@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     embedding_model: str = "text-embedding-3-large"
     embedding_dim: int = 1024
+    llm_model: str = "gpt-4o"
     milvus_uri: str = ""
     milvus_db_path: str = "milvus.db"
     milvus_collection: str = "product"
