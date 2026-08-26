@@ -15,15 +15,17 @@ export class ChatMessage {
   cards: ProductCardModel[];
   isStreaming: boolean;
   messageId: string;
+  feedback: string;
 
   constructor(id: string, role: string, text: string = '', cards: ProductCardModel[] = [],
-              isStreaming: boolean = false, messageId: string = '') {
+              isStreaming: boolean = false, messageId: string = '', feedback: string = '') {
     this.id = id;
     this.role = role;
     this.text = text;
     this.cards = cards;
     this.isStreaming = isStreaming;
     this.messageId = messageId;
+    this.feedback = feedback;
   }
 }
 

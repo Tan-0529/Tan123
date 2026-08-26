@@ -1,3 +1,6 @@
+import { photoAccessHelper } from '@kit.MediaLibraryKit';
+import { fileIo } from '@kit.CoreFileKit';
+import { util } from '@kit.ArkTS';
 import { ChatMessage, ProductCardModel } from '../model/ChatModels';
 import { ChatViewModel } from '../viewmodel/ChatViewModel';
 import { ProductCard } from '../components/ProductCard';
@@ -8,6 +11,7 @@ struct ChatPage {
   @State vm: ChatViewModel = new ChatViewModel();
   @State inputText: string = '';
   private scroller: Scroller = new Scroller();
+  private pendingImage: string = '';
 
   build() {
     Column() {
@@ -26,8 +30,9 @@ struct ChatPage {
       List({ space: 12, scroller: this.scroller }) {
         ForEach(this.vm.messages, (msg: ChatMessage) => {
           ListItem() {
-            MessageCell({ msg: msg })
+            MessageCell({ msg: msg, onFeedback: (r: string) => this.vm.feedback(msg, r) })
           }
+          .transition(TransitionEffect.OPACITY.combine(TransitionEffect.translate({ y: 20 })))
         }, (msg: ChatMessage) => msg.id)
       }
       .layoutWeight(1)
@@ -39,6 +44,14 @@ struct ChatPage {
         .color('#EEEEEE')
 
       Row({ space: 8 }) {
+        Button('图片')
+          .width(56)
+          .height(44)
+          .backgroundColor(this.pendingImage.length > 0 ? '#67C23A' : '#F5F5F5')
+          .fontColor(this.pendingImage.length > 0 ? Color.White : '#333333')
+          .onClick(() => {
+            this.pickImage();
+          })
         TextInput({ placeholder: '输入商品问题...', text: this.inputText })
           .layoutWeight(1)
           .height(44)
@@ -68,14 +81,35 @@ struct ChatPage {
     }
     const text = this.inputText;
     this.inputText = '';
-    this.vm.send(text);
+    const image = this.pendingImage.length > 0 ? this.pendingImage : undefined;
+    this.pendingImage = '';
+    this.vm.send(text, image);
     this.scroller.scrollEdge(Edge.Bottom);
+  }
+
+  private async pickImage(): Promise<void> {
+    const picker = new photoAccessHelper.PhotoViewPicker();
+    const result = await picker.select({
+      MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+      maxSelectNumber: 1
+    });
+    if (result.photoUris.length === 0) {
+      return;
+    }
+    const uri = result.photoUris[0];
+    const file = fileIo.openSync(uri, fileIo.OpenMode.READ_ONLY);
+    const stat = fileIo.statSync(file.fd);
+    const buffer = new ArrayBuffer(stat.size);
+    fileIo.readSync(file.fd, buffer);
+    fileIo.closeSync(file);
+    this.pendingImage = util.Base64Helper.encodeSync(new Uint8Array(buffer));
   }
 }
 
 @Component
 struct MessageCell {
   @ObjectLink msg: ChatMessage;
+  onFeedback: (rating: string) => void = () => {};
 
   build() {
     Column() {
@@ -95,6 +129,21 @@ struct MessageCell {
           ForEach(this.msg.cards, (card: ProductCardModel) => {
             ProductCard({ card: card })
           }, (card: ProductCardModel) => card.sku)
+          Row({ space: 10 }) {
+            Text(this.msg.feedback === 'like' ? '👍 已赞' : '👍')
+              .fontSize(13)
+              .fontColor(this.msg.feedback === 'like' ? '#4A90D9' : '#999999')
+              .onClick(() => {
+                this.onFeedback('like');
+              })
+            Text(this.msg.feedback === 'dislike' ? '👎 已踩' : '👎')
+              .fontSize(13)
+              .fontColor(this.msg.feedback === 'dislike' ? '#E64545' : '#999999')
+              .onClick(() => {
+                this.onFeedback('dislike');
+              })
+          }
+          .margin({ top: 4 })
         }
         .alignItems(HorizontalAlign.Start)
         .constraintSize({ maxWidth: '92%' })

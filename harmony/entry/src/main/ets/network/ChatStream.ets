@@ -75,4 +75,21 @@ export class ChatStream {
       this.onError(ev.message ?? 'unknown error');
     }
   }
+
+  sendFeedback(conversationId: string, messageId: string, rating: string): void {
+    const body = JSON.stringify({
+      conversation_id: conversationId,
+      message_id: messageId,
+      rating: rating,
+      comment: ''
+    });
+    this.httpRequest.request(`${BASE_URL}/feedback`, {
+      method: http.RequestMethod.POST,
+      header: { 'Content-Type': 'application/json' },
+      extraData: body,
+      expectDataType: http.HttpDataType.STRING
+    }).catch((err: BusinessError) => {
+      this.onError(`${err.code}: ${err.message}`);
+    });
+  }
 }

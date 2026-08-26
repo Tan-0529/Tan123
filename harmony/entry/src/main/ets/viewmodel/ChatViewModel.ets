@@ -35,7 +35,7 @@ export class ChatViewModel {
     };
   }
 
-  send(text: string): void {
+  send(text: string, imageBase64?: string): void {
     if (text.trim().length === 0 || this.isSending) {
       return;
     }
@@ -47,8 +47,17 @@ export class ChatViewModel {
     this.lastFlush = 0;
     this.stream.send({
       conversation_id: this.conversationId,
-      message: text
+      message: text,
+      image: imageBase64
     });
+  }
+
+  feedback(msg: ChatMessage, rating: string): void {
+    if (msg.messageId.length === 0) {
+      return;
+    }
+    msg.feedback = rating;
+    this.stream.sendFeedback(this.conversationId, msg.messageId, rating);
   }
 
   private appendDelta(t: string): void {
