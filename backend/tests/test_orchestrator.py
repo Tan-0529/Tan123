@@ -61,3 +61,18 @@ async def test_stream_chat_emits_card_events():
     assert len(cards) == 1
     assert cards[0]["data"]["sku"] == "SKU001"
 
+
+@pytest.mark.asyncio
+async def test_card_emitted_after_delta():
+    store = InMemoryVectorStore()
+    store.insert([Chunk(id="c1", doc_id="d1", text="布艺沙发", chunk_type="description",
+                        metadata={"sku": "SKU001", "title": "北欧沙发", "price": 3999,
+                                  "rating": 4.8, "image_url": "http://x/1.jpg",
+                                  "product_url": "http://x/p/1"})])
+    orch = Orchestrator(Retriever(store, FakeEmbedder(dim=8)),
+                        FakeLLM("推荐"), InMemoryMemory())
+    events = [e async for e in orch.stream_chat("c1", "沙发")]
+    last_delta_idx = max(i for i, e in enumerate(events) if e["event"] == "delta")
+    first_card_idx = min(i for i, e in enumerate(events) if e["event"] == "card")
+    assert last_delta_idx < first_card_idx
+

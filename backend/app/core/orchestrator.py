@@ -62,9 +62,6 @@ class Orchestrator:
 
         self._memory.add_turn(conversation_id, "user", message)
 
-        for card in _extract_cards(results):
-            yield {"event": "card", "data": card}
-
         full = ""
         try:
             async for token in self._llm.stream_chat(messages):
@@ -75,4 +72,8 @@ class Orchestrator:
             return
 
         self._memory.add_turn(conversation_id, "assistant", full)
+
+        for card in _extract_cards(results):
+            yield {"event": "card", "data": card}
+
         yield {"event": "done"}

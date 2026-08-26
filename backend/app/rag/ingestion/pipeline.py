@@ -21,7 +21,7 @@ class IngestionPipeline:
 
         vision_vec = None
         image_url = doc.metadata.get("image_url", "")
-        if image_url and self._image_embedder is not None:
+        if image_url and self._image_embedder is not None and "picsum" not in image_url:
             try:
                 vision_vec = self._image_embedder.embed_url(image_url)
             except Exception:
