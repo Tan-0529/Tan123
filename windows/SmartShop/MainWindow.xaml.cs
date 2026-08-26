@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private readonly ChatViewModel _vm = new();
     private readonly DispatcherTimer _scrollTimer;
     private string? _selectedImageBase64;
+    private bool _followBottom = true;
 
     public MainWindow()
     {
@@ -25,19 +26,19 @@ public partial class MainWindow : Window
         _scrollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
         _scrollTimer.Tick += (_, _) =>
         {
-            if (_vm.IsSending && IsNearBottom()) MsgScroll.ScrollToEnd();
+            if (_vm.IsSending && _followBottom) MsgScroll.ScrollToEnd();
         };
-    }
 
-    private bool IsNearBottom()
-    {
-        return MsgScroll.ScrollableHeight <= 0
-               || MsgScroll.VerticalOffset >= MsgScroll.ScrollableHeight - 40;
+        MsgScroll.ScrollChanged += (_, e) =>
+        {
+            if (_followBottom && e.VerticalChange < 0)
+                _followBottom = false;
+        };
     }
 
     private void OnMessagesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (IsNearBottom()) MsgScroll.ScrollToEnd();
+        if (_followBottom) MsgScroll.ScrollToEnd();
     }
 
     private async void SendBtn_Click(object sender, RoutedEventArgs e) => await Send();
@@ -100,6 +101,8 @@ public partial class MainWindow : Window
         var image = _selectedImageBase64;
         _selectedImageBase64 = null;
         ImageBtn.Content = "图片";
+        _followBottom = true;
+        MsgScroll.ScrollToEnd();
         _scrollTimer.Start();
         try
         {
@@ -108,7 +111,7 @@ public partial class MainWindow : Window
         finally
         {
             _scrollTimer.Stop();
-            MsgScroll.ScrollToEnd();
+            if (_followBottom) MsgScroll.ScrollToEnd();
         }
     }
 }
