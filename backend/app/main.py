@@ -9,6 +9,7 @@ from app.db.vector_store import VectorStore
 from app.db.milvus_store import MilvusStore
 from app.rag.ingestion.pipeline import IngestionPipeline
 from app.rag.retriever import Retriever
+from app.services.feedback_service import FeedbackService
 
 
 def build_embedder(settings: Settings) -> Embedder:
@@ -46,13 +47,16 @@ def create_app() -> FastAPI:
     app.state.pipeline = pipeline
     app.state.retriever = retriever
     app.state.orchestrator = orchestrator
+    app.state.feedback = FeedbackService()
 
     from app.api.routes.ingest import router as ingest_router
     from app.api.routes.search import router as search_router
     from app.api.routes.chat import router as chat_router
+    from app.api.routes.feedback import router as feedback_router
     app.include_router(ingest_router)
     app.include_router(search_router)
     app.include_router(chat_router)
+    app.include_router(feedback_router)
     return app
 
 
