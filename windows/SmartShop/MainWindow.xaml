@@ -19,7 +19,7 @@
                         Click="ImageBtn_Click"/>
                 <TextBox x:Name="InputBox" TextWrapping="Wrap" AcceptsReturn="True"
                          VerticalContentAlignment="Center" MinHeight="40" MaxHeight="120"
-                         FontSize="14" KeyDown="InputBox_KeyDown"
+                         FontSize="14" PreviewKeyDown="InputBox_KeyDown"
                          PreviewMouseWheel="InputBox_PreviewMouseWheel"/>
             </DockPanel>
         </Border>
