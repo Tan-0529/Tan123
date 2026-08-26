@@ -23,15 +23,24 @@ def build_llm(settings: Settings) -> LLM:
     return OpenAILLM(settings)
 
 
+def build_image_embedder():
+    try:
+        from app.ai.vision import ImageEmbedder
+        return ImageEmbedder()
+    except Exception:
+        return None
+
+
 def create_app() -> FastAPI:
     settings = Settings()
     store = build_store(settings)
     embedder = build_embedder(settings)
     llm = build_llm(settings)
-    pipeline = IngestionPipeline(store, embedder)
+    image_embedder = build_image_embedder()
+    pipeline = IngestionPipeline(store, embedder, image_embedder)
     retriever = Retriever(store, embedder)
     memory = InMemoryMemory()
-    orchestrator = Orchestrator(retriever, llm, memory)
+    orchestrator = Orchestrator(retriever, llm, memory, image_embedder)
 
     app = FastAPI(title="SmartShop AI")
     app.state.pipeline = pipeline

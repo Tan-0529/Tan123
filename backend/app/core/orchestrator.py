@@ -35,17 +35,28 @@ def _extract_cards(results: list[dict]) -> list[dict]:
 
 
 class Orchestrator:
-    def __init__(self, retriever: Retriever, llm: LLM, memory: MemoryStore):
+    def __init__(self, retriever: Retriever, llm: LLM, memory: MemoryStore,
+                 image_embedder=None):
         self._retriever = retriever
         self._llm = llm
         self._memory = memory
+        self._image_embedder = image_embedder
 
-    async def stream_chat(self, conversation_id: str, message: str) -> AsyncIterator[dict]:
+    async def stream_chat(self, conversation_id: str, message: str,
+                          image: str | None = None) -> AsyncIterator[dict]:
         message_id = uuid.uuid4().hex
         yield {"event": "meta", "conversation_id": conversation_id, "message_id": message_id}
 
         history = self._memory.get_history(conversation_id)
-        results = self._retriever.retrieve(message, top_k=5)
+
+        vision_vec = None
+        if image and self._image_embedder is not None:
+            try:
+                vision_vec = self._image_embedder.embed_base64(image)
+            except Exception:
+                vision_vec = None
+
+        results = self._retriever.retrieve(message, top_k=5, vision_vec=vision_vec)
         context = _format_context(results)
         messages = build_messages(history, context, message)
 

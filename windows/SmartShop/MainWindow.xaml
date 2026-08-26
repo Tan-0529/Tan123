@@ -14,6 +14,9 @@
                 <Button x:Name="SendBtn" DockPanel.Dock="Right" Content="发送"
                         Width="80" Height="40" Margin="8,0,0,0"
                         Click="SendBtn_Click"/>
+                <Button x:Name="ImageBtn" DockPanel.Dock="Right" Content="图片"
+                        Width="56" Height="40" Margin="4,0,0,0"
+                        Click="ImageBtn_Click"/>
                 <TextBox x:Name="InputBox" TextWrapping="Wrap" AcceptsReturn="True"
                          VerticalContentAlignment="Center" MinHeight="40" MaxHeight="120"
                          FontSize="14" KeyDown="InputBox_KeyDown"/>
@@ -44,6 +47,9 @@
                                 </Style>
                             </Border.Style>
                             <StackPanel>
+                                <Image Source="{Binding Image}" MaxHeight="200" MaxWidth="340"
+                                       Stretch="Uniform" Margin="0,0,0,8"
+                                       HorizontalAlignment="Left"/>
                                 <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
                                            FontSize="14" LineHeight="22"/>
                                 <ItemsControl ItemsSource="{Binding Cards}">

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
+using System.Windows.Media;
 using SmartShop.ViewModels;
 
 namespace SmartShop.Models;
@@ -14,6 +15,8 @@ public class ChatMessage : ViewModelBase
         get => _text;
         set { _text = value; OnPropertyChanged(); }
     }
+
+    public ImageSource? Image { get; set; }
 
     public ObservableCollection<ProductCardModel> Cards { get; } = new();
 }

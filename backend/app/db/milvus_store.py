@@ -19,6 +19,7 @@ class MilvusStore(VectorStore):
             schema.add_field(field_name="id", datatype=DataType.VARCHAR,
                              is_primary=True, max_length=128)
             schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=self._dim)
+            schema.add_field(field_name="vision_embedding", datatype=DataType.FLOAT_VECTOR, dim=512)
             schema.add_field(field_name="text", datatype=DataType.VARCHAR, max_length=4096)
             schema.add_field(field_name="doc_id", datatype=DataType.VARCHAR, max_length=128)
             schema.add_field(field_name="chunk_type", datatype=DataType.VARCHAR, max_length=32)
@@ -35,6 +36,8 @@ class MilvusStore(VectorStore):
             index_params = self._client.prepare_index_params()
             index_params.add_index(field_name="vector", index_type="HNSW",
                                    metric_type="COSINE", params={"M": 16, "efConstruction": 256})
+            index_params.add_index(field_name="vision_embedding", index_type="HNSW",
+                                   metric_type="COSINE", params={"M": 16, "efConstruction": 256})
             self._client.create_collection(collection_name=self._collection,
                                            schema=schema, index_params=index_params)
         self._client.load_collection(self._collection)
@@ -43,6 +46,7 @@ class MilvusStore(VectorStore):
         data = [{
             "id": c.id,
             "vector": c.metadata.get("vector", [0.0] * self._dim),
+            "vision_embedding": c.metadata.get("vision_embedding", [0.0] * 512),
             "text": c.text,
             "doc_id": c.doc_id,
             "chunk_type": c.chunk_type,
@@ -58,13 +62,14 @@ class MilvusStore(VectorStore):
         } for c in chunks]
         self._client.insert(collection_name=self._collection, data=data)
 
-    def search(self, vector, top_k=50, expr=None):
+    def search(self, vector, top_k=50, expr=None, field: str = "vector"):
         resp = self._client.search(
             collection_name=self._collection, data=[vector], limit=top_k,
-            filter=expr or "", output_fields=["text", "doc_id", "chunk_type",
-                                              "priority", "price", "rating", "category",
-                                              "brand", "sku", "title", "image_url",
-                                              "product_url"],
+            filter=expr or "", anns_field=field,
+            output_fields=["text", "doc_id", "chunk_type",
+                           "priority", "price", "rating", "category",
+                           "brand", "sku", "title", "image_url",
+                           "product_url"],
         )
         hits = []
         for item in resp[0]:

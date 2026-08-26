@@ -10,6 +10,7 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     conversation_id: str
     message: str
+    image: str | None = None
 
 
 def _sse(event: str, data: dict) -> str:
@@ -21,7 +22,8 @@ async def chat(req: ChatRequest, request: Request):
     orchestrator = request.app.state.orchestrator
 
     async def event_stream():
-        async for ev in orchestrator.stream_chat(req.conversation_id, req.message):
+        async for ev in orchestrator.stream_chat(req.conversation_id, req.message,
+                                                 image=req.image):
             yield _sse(ev["event"], {k: v for k, v in ev.items() if k != "event"})
 
     return StreamingResponse(
