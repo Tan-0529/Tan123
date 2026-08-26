@@ -19,13 +19,17 @@ class OpenAIEmbedder(Embedder):
     def __init__(self, settings: Settings):
         self._dim = settings.embedding_dim
         self._model = settings.embedding_model
-        self._client = OpenAI(
-            base_url=settings.openai_base_url,
-            api_key=settings.openai_api_key,
-        )
+        self._base_url = settings.openai_base_url
+        self._api_key = settings.openai_api_key
+        self._client = None
+
+    def _get_client(self):
+        if self._client is None:
+            self._client = OpenAI(base_url=self._base_url, api_key=self._api_key)
+        return self._client
 
     def embed(self, texts: list[str]) -> list[list[float]]:
-        resp = self._client.embeddings.create(
+        resp = self._get_client().embeddings.create(
             model=self._model, input=texts, dimensions=self._dim
         )
         return [d.embedding for d in resp.data]
