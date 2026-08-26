@@ -25,12 +25,20 @@ public partial class MainWindow : Window
         _scrollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
         _scrollTimer.Tick += (_, _) =>
         {
-            if (_vm.IsSending) MsgScroll.ScrollToEnd();
+            if (_vm.IsSending && IsNearBottom()) MsgScroll.ScrollToEnd();
         };
     }
 
+    private bool IsNearBottom()
+    {
+        return MsgScroll.ScrollableHeight <= 0
+               || MsgScroll.VerticalOffset >= MsgScroll.ScrollableHeight - 40;
+    }
+
     private void OnMessagesChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        => MsgScroll.ScrollToEnd();
+    {
+        if (IsNearBottom()) MsgScroll.ScrollToEnd();
+    }
 
     private async void SendBtn_Click(object sender, RoutedEventArgs e) => await Send();
 
@@ -50,13 +58,28 @@ public partial class MainWindow : Window
     private async void LikeBtn_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.Tag is ChatMessage msg)
+        {
             await _vm.FeedbackAsync(msg, "like");
+            MessageBox.Show("感谢您的反馈！", "SmartShop AI",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+        }
     }
 
     private async void DislikeBtn_Click(object sender, RoutedEventArgs e)
     {
         if ((sender as FrameworkElement)?.Tag is ChatMessage msg)
+        {
             await _vm.FeedbackAsync(msg, "dislike");
+            MessageBox.Show("感谢您的反馈！", "SmartShop AI",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
+    private void InputBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (e.Delta > 0) MsgScroll.LineUp();
+        else MsgScroll.LineDown();
+        e.Handled = true;
     }
 
     private async void InputBox_KeyDown(object sender, KeyEventArgs e)
