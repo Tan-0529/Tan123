@@ -32,13 +32,24 @@ public class ChatStream
             await using var stream = await resp.Content.ReadAsStreamAsync(ct);
             using var reader = new StreamReader(stream);
 
+            var currentEvent = "message";
             string? line;
             while ((line = await reader.ReadLineAsync(ct)) is not null)
             {
-                if (!line.StartsWith("data: ")) continue;
-                var payload = line[6..];
-                if (payload == "[DONE]") break;
-                Dispatch(payload);
+                if (line.StartsWith("event: "))
+                {
+                    currentEvent = line[7..].Trim();
+                }
+                else if (line.StartsWith("data: "))
+                {
+                    var payload = line[6..];
+                    if (payload == "[DONE]") break;
+                    Dispatch(currentEvent, payload);
+                }
+                else if (line.Length == 0)
+                {
+                    currentEvent = "message";
+                }
             }
             OnDone();
         }
@@ -48,23 +59,28 @@ public class ChatStream
         }
     }
 
-    private void Dispatch(string payload)
+    private void Dispatch(string ev, string payload)
     {
         using var doc = JsonDocument.Parse(payload);
         var root = doc.RootElement;
-        var ev = root.GetProperty("event").GetString();
         switch (ev)
         {
             case "delta":
-                OnDelta(root.GetProperty("content").GetString() ?? "");
+                if (root.TryGetProperty("content", out var c))
+                    OnDelta(c.GetString() ?? "");
                 break;
             case "card":
-                var card = JsonSerializer.Deserialize<ProductCardModel>(
-                    root.GetProperty("data").GetRawText());
-                if (card != null) OnCard(card);
+                if (root.TryGetProperty("data", out var d))
+                {
+                    var card = JsonSerializer.Deserialize<ProductCardModel>(d.GetRawText());
+                    if (card != null) OnCard(card);
+                }
                 break;
             case "error":
-                OnError(root.GetProperty("message").GetString() ?? "unknown error");
+                if (root.TryGetProperty("message", out var m))
+                    OnError(m.GetString() ?? "unknown error");
+                else
+                    OnError("unknown error");
                 break;
         }
     }
