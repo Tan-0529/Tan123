@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using SmartShop.Models;
 using SmartShop.ViewModels;
 
 namespace SmartShop;
@@ -44,6 +45,18 @@ public partial class MainWindow : Window
             _selectedImageBase64 = Convert.ToBase64String(File.ReadAllBytes(dlg.FileName));
             ImageBtn.Content = "图片✓";
         }
+    }
+
+    private async void LikeBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is ChatMessage msg)
+            await _vm.FeedbackAsync(msg, "like");
+    }
+
+    private async void DislikeBtn_Click(object sender, RoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.Tag is ChatMessage msg)
+            await _vm.FeedbackAsync(msg, "dislike");
     }
 
     private async void InputBox_KeyDown(object sender, KeyEventArgs e)

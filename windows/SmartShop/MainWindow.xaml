@@ -104,6 +104,22 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Role}" Value="assistant">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <Button Content="👍" Width="32" Height="26" Margin="0,0,6,0"
+                                            FontSize="13" Click="LikeBtn_Click" Tag="{Binding}"/>
+                                    <Button Content="👎" Width="32" Height="26"
+                                            FontSize="13" Click="DislikeBtn_Click" Tag="{Binding}"/>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </DataTemplate>

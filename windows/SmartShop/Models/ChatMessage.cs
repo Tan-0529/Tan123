@@ -18,6 +18,15 @@ public class ChatMessage : ViewModelBase
 
     public ImageSource? Image { get; set; }
 
+    public string? MessageId { get; set; }
+
+    private string? _feedback;
+    public string? Feedback
+    {
+        get => _feedback;
+        set { _feedback = value; OnPropertyChanged(); }
+    }
+
     private bool _isStreaming;
     public bool IsStreaming
     {

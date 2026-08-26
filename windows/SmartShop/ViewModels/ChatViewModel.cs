@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Windows.Media.Imaging;
 using SmartShop.Models;
 using SmartShop.Network;
@@ -27,6 +30,7 @@ public class ChatViewModel : ViewModelBase
     {
         _stream.OnDelta = AppendDelta;
         _stream.OnCard = card => _reply?.Cards.Add(card);
+        _stream.OnMeta = mid => { if (_reply != null) _reply.MessageId = mid; };
         _stream.OnDone = () =>
         {
             Flush();
@@ -68,6 +72,32 @@ public class ChatViewModel : ViewModelBase
             Image = imageBase64,
         });
     }
+
+    public async Task FeedbackAsync(ChatMessage msg, string rating)
+    {
+        if (msg.MessageId is null) return;
+        msg.Feedback = rating;
+        try
+        {
+            var body = JsonSerializer.Serialize(new
+            {
+                conversation_id = _conversationId,
+                message_id = msg.MessageId,
+                rating = rating,
+                comment = "",
+            });
+            var req = new HttpRequestMessage(HttpMethod.Post, "http://127.0.0.1:8000/feedback")
+            {
+                Content = new StringContent(body, Encoding.UTF8, "application/json"),
+            };
+            await _http.SendAsync(req);
+        }
+        catch
+        {
+        }
+    }
+
+    private readonly HttpClient _http = new();
 
     private static System.Windows.Media.ImageSource? DecodeBase64(string base64)
     {

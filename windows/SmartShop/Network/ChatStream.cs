@@ -16,6 +16,7 @@ public class ChatStream
     public Action<ProductCardModel> OnCard = _ => { };
     public Action OnDone = () => { };
     public Action<string> OnError = _ => { };
+    public Action<string> OnMeta = _ => { };
 
     public async Task SendAsync(ChatInput input, CancellationToken ct = default)
     {
@@ -65,6 +66,10 @@ public class ChatStream
         var root = doc.RootElement;
         switch (ev)
         {
+            case "meta":
+                if (root.TryGetProperty("message_id", out var mid))
+                    OnMeta(mid.GetString() ?? "");
+                break;
             case "delta":
                 if (root.TryGetProperty("content", out var c))
                     OnDelta(c.GetString() ?? "");
