@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "SmartShop AI 智能导购"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "SmartShop AI 智能导购"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "SmartShop AI"
+    }
+  ]
+}
