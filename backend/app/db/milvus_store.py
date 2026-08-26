@@ -14,26 +14,26 @@ class MilvusStore(VectorStore):
         self._ensure_collection()
 
     def _ensure_collection(self) -> None:
-        if self._client.has_collection(self._collection):
-            return
-        schema = self._client.create_schema(auto_id=False, enable_dynamic_field=False)
-        schema.add_field(field_name="id", datatype=DataType.VARCHAR,
-                         is_primary=True, max_length=128)
-        schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=self._dim)
-        schema.add_field(field_name="text", datatype=DataType.VARCHAR, max_length=4096)
-        schema.add_field(field_name="doc_id", datatype=DataType.VARCHAR, max_length=128)
-        schema.add_field(field_name="chunk_type", datatype=DataType.VARCHAR, max_length=32)
-        schema.add_field(field_name="priority", datatype=DataType.INT64)
-        schema.add_field(field_name="price", datatype=DataType.DOUBLE)
-        schema.add_field(field_name="category", datatype=DataType.VARCHAR, max_length=64)
-        schema.add_field(field_name="brand", datatype=DataType.VARCHAR, max_length=64)
-        schema.add_field(field_name="sku", datatype=DataType.VARCHAR, max_length=64)
+        if not self._client.has_collection(self._collection):
+            schema = self._client.create_schema(auto_id=False, enable_dynamic_field=False)
+            schema.add_field(field_name="id", datatype=DataType.VARCHAR,
+                             is_primary=True, max_length=128)
+            schema.add_field(field_name="vector", datatype=DataType.FLOAT_VECTOR, dim=self._dim)
+            schema.add_field(field_name="text", datatype=DataType.VARCHAR, max_length=4096)
+            schema.add_field(field_name="doc_id", datatype=DataType.VARCHAR, max_length=128)
+            schema.add_field(field_name="chunk_type", datatype=DataType.VARCHAR, max_length=32)
+            schema.add_field(field_name="priority", datatype=DataType.INT64)
+            schema.add_field(field_name="price", datatype=DataType.DOUBLE)
+            schema.add_field(field_name="category", datatype=DataType.VARCHAR, max_length=64)
+            schema.add_field(field_name="brand", datatype=DataType.VARCHAR, max_length=64)
+            schema.add_field(field_name="sku", datatype=DataType.VARCHAR, max_length=64)
 
-        index_params = self._client.prepare_index_params()
-        index_params.add_index(field_name="vector", index_type="HNSW",
-                               metric_type="COSINE", params={"M": 16, "efConstruction": 256})
-        self._client.create_collection(collection_name=self._collection,
-                                       schema=schema, index_params=index_params)
+            index_params = self._client.prepare_index_params()
+            index_params.add_index(field_name="vector", index_type="HNSW",
+                                   metric_type="COSINE", params={"M": 16, "efConstruction": 256})
+            self._client.create_collection(collection_name=self._collection,
+                                           schema=schema, index_params=index_params)
+        self._client.load_collection(self._collection)
 
     def insert(self, chunks: list[Chunk]) -> None:
         data = [{
