@@ -8,44 +8,32 @@
             <TextBlock Text="SmartShop AI 智能导购" FontSize="16" FontWeight="Bold" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <ScrollViewer x:Name="MsgScroll" Margin="12,0" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer x:Name="MsgScroll" Margin="12,0" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch">
             <ItemsControl ItemsSource="{Binding Messages}">
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ContentControl>
-                            <ContentControl.Style>
-                                <Style TargetType="ContentControl">
+                        <Border Padding="12" Margin="0,6" CornerRadius="10" MaxWidth="400">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="#F2F3F5"/>
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Role}" Value="user">
-                                            <Setter Property="ContentTemplate">
-                                                <Setter.Value>
-                                                    <DataTemplate>
-                                                        <Border Background="#D6EAF8" CornerRadius="10" Padding="12"
-                                                                HorizontalAlignment="Right" MaxWidth="380" Margin="0,6">
-                                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
-                                                                       FontSize="14" LineHeight="22"/>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Role}" Value="assistant">
-                                            <Setter Property="ContentTemplate">
-                                                <Setter.Value>
-                                                    <DataTemplate>
-                                                        <Border Background="#F2F3F5" CornerRadius="10" Padding="12"
-                                                                HorizontalAlignment="Left" MaxWidth="400" Margin="0,6">
-                                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
-                                                                       FontSize="14" LineHeight="22"/>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </Setter.Value>
-                                            </Setter>
+                                            <Setter Property="Background" Value="#D6EAF8"/>
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </ContentControl.Style>
-                        </ContentControl>
+                            </Border.Style>
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
+                                       FontSize="14" LineHeight="22"/>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
