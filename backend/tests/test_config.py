@@ -3,8 +3,8 @@ from app.config import Settings
 
 def test_settings_defaults():
     settings = Settings(_env_file=None)
-    assert settings.embedding_dim == 1024
-    assert settings.embedding_model == "text-embedding-3-large"
+    assert settings.embedding_dim == 512
+    assert settings.embedding_model == "BAAI/bge-small-zh-v1.5"
     assert settings.milvus_db_path.endswith("milvus.db")
 
 
@@ -18,4 +18,4 @@ def test_settings_from_env(monkeypatch):
 
 def test_settings_llm_model_default():
     settings = Settings(_env_file=None)
-    assert settings.llm_model == "gpt-4o"
+    assert settings.llm_model == "gpt-5.5"

@@ -1,4 +1,5 @@
 import hashlib
+import os
 import struct
 from abc import ABC, abstractmethod
 
@@ -13,6 +14,17 @@ class Embedder(ABC):
 
     def embed_query(self, text: str) -> list[float]:
         return self.embed([text])[0]
+
+
+class LocalEmbedder(Embedder):
+    def __init__(self, model_name: str = "BAAI/bge-small-zh-v1.5"):
+        os.environ.setdefault("HF_HUB_DISABLE_XET", "1")
+        os.environ.setdefault("HF_ENDPOINT", "https://hf-mirror.com")
+        from fastembed import TextEmbedding
+        self._model = TextEmbedding(model_name=model_name)
+
+    def embed(self, texts: list[str]) -> list[list[float]]:
+        return [list(v) for v in self._model.embed(texts)]
 
 
 class OpenAIEmbedder(Embedder):

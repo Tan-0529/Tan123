@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.ai.embedding import Embedder, OpenAIEmbedder
+from app.ai.embedding import Embedder, LocalEmbedder
 from app.ai.llm import LLM, OpenAILLM
 from app.config import Settings
 from app.core.memory import InMemoryMemory
@@ -12,7 +12,7 @@ from app.rag.retriever import Retriever
 
 
 def build_embedder(settings: Settings) -> Embedder:
-    return OpenAIEmbedder(settings)
+    return LocalEmbedder(settings.embedding_model)
 
 
 def build_store(settings: Settings) -> VectorStore:

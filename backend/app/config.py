@@ -6,9 +6,9 @@ class Settings(BaseSettings):
 
     openai_base_url: str = "https://api.openai.com/v1"
     openai_api_key: str = ""
-    embedding_model: str = "text-embedding-3-large"
-    embedding_dim: int = 1024
-    llm_model: str = "gpt-4o"
+    embedding_model: str = "BAAI/bge-small-zh-v1.5"
+    embedding_dim: int = 512
+    llm_model: str = "gpt-5.5"
     milvus_uri: str = ""
     milvus_db_path: str = "milvus.db"
     milvus_collection: str = "product"
