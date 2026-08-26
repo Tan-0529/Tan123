@@ -14,3 +14,10 @@ def test_ingest_with_attributes():
     n = pipe.ingest("正文", {"doc_id": "d1", "source_type": "text", "title": "T",
                              "attributes": {"材质": "布艺"}})
     assert n == 2
+
+
+def test_ingest_injects_title_into_chunks():
+    store = InMemoryVectorStore()
+    pipe = IngestionPipeline(store, FakeEmbedder(dim=8))
+    pipe.ingest("正文内容", {"doc_id": "d1", "source_type": "text", "title": "北欧沙发"})
+    assert all("title" in fields for fields in store._fields.values())

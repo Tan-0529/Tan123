@@ -15,6 +15,8 @@ class IngestionPipeline:
         chunks = chunk_document(doc)
         if not chunks:
             return 0
+        for chunk in chunks:
+            chunk.metadata["title"] = doc.title
         vecs = self._embedder.embed([c.text for c in chunks])
         for chunk, vec in zip(chunks, vecs):
             chunk.metadata["vector"] = vec
