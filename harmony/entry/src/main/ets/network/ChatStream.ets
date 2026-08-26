@@ -3,7 +3,8 @@ import util from '@ohos.util';
 import { BusinessError } from '@ohos.base';
 import { ChatInput, ProductCardModel, SSEEvent } from '../model/ChatModels';
 
-const BASE_URL: string = 'http://127.0.0.1:8000';
+// 模拟器访问宿主机用 10.0.2.2；真机(USB/WiFi)改成电脑局域网 IP，如 http://192.168.1.209:8000
+const BASE_URL: string = 'http://10.0.2.2:8000';
 
 export class ChatStream {
   private httpRequest: http.HttpRequest = http.createHttp();
