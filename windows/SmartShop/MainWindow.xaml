@@ -1,6 +1,7 @@
 ﻿<Window x:Class="SmartShop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:components="clr-namespace:SmartShop.Components"
         Title="SmartShop AI" Height="720" Width="520"
         WindowStartupLocation="CenterScreen">
     <DockPanel>
@@ -42,8 +43,17 @@
                                     </Style.Triggers>
                                 </Style>
                             </Border.Style>
-                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
-                                       FontSize="14" LineHeight="22"/>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Text}" TextWrapping="Wrap"
+                                           FontSize="14" LineHeight="22"/>
+                                <ItemsControl ItemsSource="{Binding Cards}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <components:ProductCard/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

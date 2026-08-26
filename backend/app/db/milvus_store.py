@@ -24,9 +24,13 @@ class MilvusStore(VectorStore):
             schema.add_field(field_name="chunk_type", datatype=DataType.VARCHAR, max_length=32)
             schema.add_field(field_name="priority", datatype=DataType.INT64)
             schema.add_field(field_name="price", datatype=DataType.DOUBLE)
+            schema.add_field(field_name="rating", datatype=DataType.DOUBLE)
             schema.add_field(field_name="category", datatype=DataType.VARCHAR, max_length=64)
             schema.add_field(field_name="brand", datatype=DataType.VARCHAR, max_length=64)
             schema.add_field(field_name="sku", datatype=DataType.VARCHAR, max_length=64)
+            schema.add_field(field_name="title", datatype=DataType.VARCHAR, max_length=256)
+            schema.add_field(field_name="image_url", datatype=DataType.VARCHAR, max_length=512)
+            schema.add_field(field_name="product_url", datatype=DataType.VARCHAR, max_length=512)
 
             index_params = self._client.prepare_index_params()
             index_params.add_index(field_name="vector", index_type="HNSW",
@@ -44,9 +48,13 @@ class MilvusStore(VectorStore):
             "chunk_type": c.chunk_type,
             "priority": c.priority,
             "price": c.metadata.get("price", 0.0),
+            "rating": c.metadata.get("rating", 0.0),
             "category": c.metadata.get("category", ""),
             "brand": c.metadata.get("brand", ""),
             "sku": c.metadata.get("sku", ""),
+            "title": c.metadata.get("title", ""),
+            "image_url": c.metadata.get("image_url", ""),
+            "product_url": c.metadata.get("product_url", ""),
         } for c in chunks]
         self._client.insert(collection_name=self._collection, data=data)
 
@@ -54,8 +62,9 @@ class MilvusStore(VectorStore):
         resp = self._client.search(
             collection_name=self._collection, data=[vector], limit=top_k,
             filter=expr or "", output_fields=["text", "doc_id", "chunk_type",
-                                              "priority", "price", "category",
-                                              "brand", "sku"],
+                                              "priority", "price", "rating", "category",
+                                              "brand", "sku", "title", "image_url",
+                                              "product_url"],
         )
         hits = []
         for item in resp[0]:

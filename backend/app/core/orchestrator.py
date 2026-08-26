@@ -14,6 +14,26 @@ def _format_context(results: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def _extract_cards(results: list[dict]) -> list[dict]:
+    cards = []
+    seen = set()
+    for r in results:
+        meta = r.get("metadata", {})
+        sku = meta.get("sku") or meta.get("doc_id") or ""
+        if not sku or sku in seen:
+            continue
+        seen.add(sku)
+        cards.append({
+            "name": meta.get("title") or meta.get("doc_id") or "",
+            "price": meta.get("price", 0.0),
+            "rating": meta.get("rating", 0.0),
+            "image_url": meta.get("image_url", ""),
+            "product_url": meta.get("product_url", ""),
+            "sku": sku,
+        })
+    return cards
+
+
 class Orchestrator:
     def __init__(self, retriever: Retriever, llm: LLM, memory: MemoryStore):
         self._retriever = retriever
@@ -30,6 +50,9 @@ class Orchestrator:
         messages = build_messages(history, context, message)
 
         self._memory.add_turn(conversation_id, "user", message)
+
+        for card in _extract_cards(results):
+            yield {"event": "card", "data": card}
 
         full = ""
         try:
